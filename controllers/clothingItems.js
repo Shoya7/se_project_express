@@ -23,7 +23,7 @@ const createItem = (req, res) => {
           .send({ message: "Error from createItem" });
       }
       return res
-        .status(INTERNAL_SERVICE)
+        .status(INTERNAL_SERVICE_ERROR)
         .send({ message: "Internal server error" });
     });
 };
