@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const routes = require("./routes");
+// const routes = require("./routes");
 const mainRouter = require("./routes/index");
 
 const app = express();
@@ -14,7 +14,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(routes);
+// app.use(routes);
 app.use("/", mainRouter);
 
 mongoose
@@ -28,8 +28,3 @@ mongoose
   .catch((error) => {
     console.error("Error connecting to the database", error);
   });
-
-// module.exports.createClothingItem = (req) => {
-//   const { owner } = req.user._id;
-//   console.log(owner); // _id will become accessible
-// };
