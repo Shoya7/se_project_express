@@ -38,35 +38,54 @@ const getItems = (req, res) => {
     });
 };
 
+// const deleteItem = (req, res) => {
+//   const { itemId } = req.params;
+
+//   console.log(`deleteItem called with itemId: ${itemId}`);
+
+//   if (!mongoose.Types.ObjectId.isValid(itemId)) {
+//     return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
+//   }
+
+//   return ClothingItem.findByIdAndDelete(itemId)
+//     .orFail(() => {
+//       const error = new Error("Card ID not found");
+//       error.statusCode = NOT_FOUND;
+//       throw error;
+//     })
+//     .then((item) => {
+//       res.status(200).send({ data: item });
+//     })
+//     .catch((err) => {
+//       if (err.name === "CastError") {
+//         return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
+//       }
+//       if (err.statusCode === NOT_FOUND) {
+//         return res.status(NOT_FOUND).send({ message: "Item not found" });
+//       }
+//       return res
+//         .status(INTERNAL_SERVICE_ERROR)
+//         .send({ message: "Internal server error" });
+//     });
+// };
+
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  console.log(`deleteItem called with itemId: ${itemId}`);
-
-  if (!mongoose.Types.ObjectId.isValid(itemId)) {
-    return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
-  }
-
-  return ClothingItem.findByIdAndDelete(itemId)
-    .orFail(() => {
-      const error = new Error("Card ID not found");
-      error.statusCode = NOT_FOUND;
-      throw error;
-    })
+  ClothingItem.findById(itemId)
     .then((item) => {
-      res.status(200).send({ data: item });
+      if (!item) {
+        return res.status(404).send({ message: "Item not found" });
+      }
+      if (item.owner.toString() !== req.user._id) {
+        return res
+          .status(403)
+          .send({ message: "Not authorized to delete this item" });
+      }
+      return ClothingItem.findByIdAndRemove(itemId);
     })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
-      }
-      if (err.statusCode === NOT_FOUND) {
-        return res.status(NOT_FOUND).send({ message: "Item not found" });
-      }
-      return res
-        .status(INTERNAL_SERVICE_ERROR)
-        .send({ message: "Internal server error" });
-    });
+    .then((item) => res.send(item))
+    .catch((err) => res.status(500).send({ message: "Internal server error" }));
 };
 
 const likeItem = (req, res) => {

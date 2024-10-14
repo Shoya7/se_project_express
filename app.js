@@ -28,3 +28,7 @@ mongoose
   .catch((error) => {
     console.error("Error connecting to the database", error);
   });
+
+const cors = require("cors");
+
+app.use(cors());

@@ -10,3 +10,8 @@ router.use((req, res) => {
 });
 
 module.exports = router;
+
+const { login, createUser } = require("../controllers/users");
+
+app.post("/signin", login);
+app.post("/signup", createUser);
