@@ -10,11 +10,10 @@ const {
   unlikeItem,
 } = require("../controllers/clothingItems");
 
+router.get("/", getItems);
+
 // Create
 router.post("/", createItem);
-
-// Read
-router.get("/", getItems);
 
 // Like
 router.put("/:itemId/likes", likeItem);

@@ -5,6 +5,9 @@ const {
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVICE_ERROR,
+  CREATED,
+  OK,
+  FORBIDDEN,
 } = require("../utils/errors");
 
 const createItem = (req, res) => {
@@ -14,7 +17,7 @@ const createItem = (req, res) => {
   return ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {
       console.log(item);
-      res.status(201).send(item);
+      res.status(CREATED).send(item);
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
@@ -30,7 +33,7 @@ const createItem = (req, res) => {
 
 const getItems = (req, res) => {
   ClothingItem.find({})
-    .then((items) => res.status(200).send(items))
+    .then((items) => res.status(OK).send(items))
     .catch(() => {
       res
         .status(INTERNAL_SERVICE_ERROR)
@@ -41,32 +44,24 @@ const getItems = (req, res) => {
 // const deleteItem = (req, res) => {
 //   const { itemId } = req.params;
 
-//   console.log(`deleteItem called with itemId: ${itemId}`);
-
-//   if (!mongoose.Types.ObjectId.isValid(itemId)) {
-//     return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
-//   }
-
-//   return ClothingItem.findByIdAndDelete(itemId)
-//     .orFail(() => {
-//       const error = new Error("Card ID not found");
-//       error.statusCode = NOT_FOUND;
-//       throw error;
-//     })
+//   ClothingItem.findById(itemId)
 //     .then((item) => {
-//       res.status(200).send({ data: item });
-//     })
-//     .catch((err) => {
-//       if (err.name === "CastError") {
-//         return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
-//       }
-//       if (err.statusCode === NOT_FOUND) {
+//       if (!item) {
 //         return res.status(NOT_FOUND).send({ message: "Item not found" });
 //       }
-//       return res
+//       if (item.owner.toString() !== req.user._id) {
+//         return res
+//           .status(FORBIDDEN)
+//           .send({ message: "Not authorized to delete this item" });
+//       }
+//       return ClothingItem.findByIdAndRemove(itemId);
+//     })
+//     .then((item) => res.send(item))
+//     .catch((err) =>
+//       res
 //         .status(INTERNAL_SERVICE_ERROR)
-//         .send({ message: "Internal server error" });
-//     });
+//         .send({ message: "Internal server error" })
+//     );
 // };
 
 const deleteItem = (req, res) => {
@@ -75,17 +70,22 @@ const deleteItem = (req, res) => {
   ClothingItem.findById(itemId)
     .then((item) => {
       if (!item) {
-        return res.status(404).send({ message: "Item not found" });
+        return res.status(NOT_FOUND).send({ message: "Item not found" });
       }
       if (item.owner.toString() !== req.user._id) {
         return res
-          .status(403)
+          .status(FORBIDDEN)
           .send({ message: "Not authorized to delete this item" });
       }
-      return ClothingItem.findByIdAndRemove(itemId);
+      return ClothingItem.findByIdAndRemove(itemId).then((deletedItem) => {
+        res.send({ deletedItem });
+      });
     })
-    .then((item) => res.send(item))
-    .catch((err) => res.status(500).send({ message: "Internal server error" }));
+    .catch((err) => {
+      res
+        .status(INTERNAL_SERVICE_ERROR)
+        .send({ message: "Internal server error" });
+    });
 };
 
 const likeItem = (req, res) => {
@@ -106,11 +106,11 @@ const likeItem = (req, res) => {
         console.log("No item found with given ID");
         return res.status(NOT_FOUND).send({ message: "Item not found" });
       }
-      return res.status(200).send({ data: item });
+      return res.status(OK).send({ data: item });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(NOT_FOUND).send({ message: "Item not found" });
+        return res.status(BAD_REQUEST).send({ message: "Item not found" });
       }
       return res
         .status(INTERNAL_SERVICE_ERROR)
