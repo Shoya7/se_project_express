@@ -5,6 +5,7 @@ const CREATED = 201;
 const OK = 200;
 const FORBIDDEN = 403;
 const UNAUTHORIZED = 401;
+const CONFLICT = 409;
 
 module.exports = {
   BAD_REQUEST,
@@ -14,4 +15,5 @@ module.exports = {
   OK,
   FORBIDDEN,
   UNAUTHORIZED,
+  CONFLICT,
 };

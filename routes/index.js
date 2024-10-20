@@ -2,6 +2,7 @@ const router = require("express").Router();
 const clothingItem = require("./clothingItem");
 const userRouter = require("./users");
 const { NOT_FOUND } = require("../utils/errors");
+const { login, createUser } = require("../controllers/users");
 
 router.post("/signin", login);
 router.post("/signup", createUser);
@@ -13,5 +14,3 @@ router.use((req, res) => {
 });
 
 module.exports = router;
-
-const { login, createUser } = require("../controllers/users");

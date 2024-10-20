@@ -1,3 +1,5 @@
-const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-  expiresIn: "7d",
-});
+require("dotenv").config();
+
+const { JWT_SECRET = "secret-key" } = process.env;
+
+module.exports = { JWT_SECRET };

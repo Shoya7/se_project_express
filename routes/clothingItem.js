@@ -1,27 +1,21 @@
-const express = require("express");
-
-const router = express.Router();
+// const express = require("express");
+// const router = express.Router();
+const router = require("express").Router();
+const auth = require("../middlewares/auth");
+const { likeItem, unlikeItem } = require("../controllers/clothingItems");
 
 const {
-  createItem,
   getItems,
+  createItem,
   deleteItem,
-  likeItem,
-  unlikeItem,
 } = require("../controllers/clothingItems");
-
+// Public route
 router.get("/", getItems);
 
-// Create
-router.post("/", createItem);
-
-// Like
-router.put("/:itemId/likes", likeItem);
-
-// Unlike
-router.delete("/:itemId/likes", unlikeItem);
-
-// Delete
-router.delete("/:itemId", deleteItem);
+// Protected routes
+router.post("/", auth, createItem);
+router.put("/:itemId/likes", auth, likeItem);
+router.delete("/:itemId/likes", auth, unlikeItem);
+router.delete("/:itemId", auth, deleteItem);
 
 module.exports = router;
