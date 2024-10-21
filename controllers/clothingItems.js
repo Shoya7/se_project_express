@@ -16,7 +16,6 @@ const createItem = (req, res) => {
 
   return ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {
-      // console.log(item);
       res.status(CREATED).send(item);
     })
     .catch((err) => {
@@ -29,7 +28,7 @@ const createItem = (req, res) => {
     });
 };
 
-const getItems = (req, res) => {
+const getItems = (req, res) =>
   ClothingItem.find({})
     .then((items) => res.status(OK).send(items))
     .catch(() => {
@@ -37,12 +36,15 @@ const getItems = (req, res) => {
         .status(INTERNAL_SERVICE_ERROR)
         .send({ message: "Error from getItems" });
     });
-};
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findById(itemId)
+  if (!mongoose.Types.ObjectId.isValid(itemId)) {
+    return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
+  }
+
+  return ClothingItem.findById(itemId)
     .then((item) => {
       if (!item) {
         return res.status(NOT_FOUND).send({ message: "Item not found" });
@@ -56,8 +58,11 @@ const deleteItem = (req, res) => {
         res.send({ deletedItem });
       });
     })
-    .catch(() => {
-      res
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
+      }
+      return res
         .status(INTERNAL_SERVICE_ERROR)
         .send({ message: "Internal server error" });
     });
@@ -65,7 +70,6 @@ const deleteItem = (req, res) => {
 
 const likeItem = (req, res) => {
   const { itemId } = req.params;
-  // console.log(`likeItem called with itemId: ${itemId}`);
 
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
     return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
@@ -110,7 +114,7 @@ const unlikeItem = (req, res) => {
       if (!item) {
         return res.status(NOT_FOUND).send({ message: "Item not found" });
       }
-      res.status(OK).send({ data: item });
+      return res.status(OK).send({ data: item });
     })
     .catch((err) => {
       if (err.name === "CastError") {
@@ -121,6 +125,7 @@ const unlikeItem = (req, res) => {
         .send({ message: "Internal server error" });
     });
 };
+
 module.exports = {
   createItem,
   getItems,
