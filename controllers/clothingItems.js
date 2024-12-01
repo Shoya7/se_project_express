@@ -16,7 +16,7 @@ const createItem = (req, res) => {
 
   return ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {
-      res.status(CREATED).send(item);
+      res.status(CREATED).send({ data: item });
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
@@ -27,6 +27,24 @@ const createItem = (req, res) => {
         .send({ message: "An error occurred on the server" });
     });
 };
+
+// const createItem = (req, res) => {
+//   const { name, weather, imageUrl } = req.body;
+//   const owner = req.user._id;
+
+//   return ClothingItem.create({ name, weather, imageUrl, owner })
+//     .then((item) => {
+//       res.status(CREATED).send(item);
+//     })
+//     .catch((err) => {
+//       if (err.name === "ValidationError") {
+//         return res.status(BAD_REQUEST).send({ message: err.message });
+//       }
+//       return res
+//         .status(INTERNAL_SERVICE_ERROR)
+//         .send({ message: "An error occurred on the server" });
+//     });
+// };
 
 const getItems = (req, res) =>
   ClothingItem.find({})
