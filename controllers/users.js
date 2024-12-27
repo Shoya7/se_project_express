@@ -12,7 +12,7 @@ const {
   CONFLICT,
 } = require("../utils/errors");
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   bcrypt
@@ -23,14 +23,14 @@ const createUser = (req, res) => {
     )
     .catch((err) => {
       if (err.code === 11000) {
-        return res.status(CONFLICT).send({ message: "Email already exists" });
+        next(new ConflictError("Email already exists"));
+        return;
       }
       if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: err.message });
+        next(new BadRequestError(err.message));
+        return;
       }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Internal server error" });
+      next(err);
     });
 };
 
