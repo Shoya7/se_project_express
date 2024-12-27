@@ -23,4 +23,8 @@ const auth = (req, res, next) => {
   }
 };
 
+const baseUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://api.wtwr.dream.org.il"
+    : "http://localhost:3001";
 module.exports = auth;

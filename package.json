@@ -7,7 +7,9 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "homepage": "https://www.wtwr.dream.org.il",
+    "deploy": "npm run build && scp -r ./dist/* haliburton7@35.223.155.189:/home/haliburton7/wtwr.dream.org.il"
   },
   "author": "Steven Haliburton",
   "license": "ISC",
