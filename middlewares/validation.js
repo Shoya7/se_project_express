@@ -59,10 +59,24 @@ const validateAuthentication = celebrate({
 
 const validateId = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().required().hex().length(24).messages({
+    itemId: Joi.string().required().hex().length(24).messages({
       "string.empty": "ID is required",
       "string.length": "ID must be 24 characters long",
       "string.hex": "ID must be a hexadecimal value",
+    }),
+  }),
+});
+
+const validateUpdateProfile = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30).messages({
+      "string.min": 'The minimum length of the "name" field is 2',
+      "string.max": 'The maximum length of the "name" field is 30',
+      "string.empty": 'The "name" field must be filled in',
+    }),
+    avatar: Joi.string().required().custom(validateURL).messages({
+      "string.empty": 'The "avatar" field must be filled in',
+      "string.uri": 'the "avatar" field must be a valid url',
     }),
   }),
 });
@@ -72,10 +86,5 @@ module.exports = {
   validateUserBody,
   validateAuthentication,
   validateId,
+  validateUpdateProfile,
 };
-/**
- * Validates the user's request body for creating a new user.
- * Checks that the 'name' field is a string between 2 and 30 characters long,
- * the 'avatar' field is a valid URL, the 'email' field is a valid email address,
- * and the 'password' field is not empty.
- */

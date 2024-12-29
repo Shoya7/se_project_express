@@ -1,16 +1,11 @@
 const router = require("express").Router();
-const auth = require("../middlewares/auth");
-const { getCurrentUser, updateProfile } = require("../controllers/users");
-const {
-  validateUserBody,
-  validateAuthentication,
-  validateId,
-} = require("../middlewares/validation");
 
+const auth = require("../middlewares/auth.js");
+const { getCurrentUser, updateProfile } = require("../controllers/users.js");
+const { validateUpdateProfile } = require("../middlewares/validation.js");
 // Protected routes
 router.get("/me", auth, getCurrentUser);
-router.patch("/me", auth, updateProfile);
-router.post("/signup", validateUserBody, createUser);
-router.post("/signin", validateAuthentication, login);
-router.get("/users/:id", validateId, getUser);
+
+router.patch("/me", auth, validateUpdateProfile, updateProfile);
+
 module.exports = router;
